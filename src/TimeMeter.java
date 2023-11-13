@@ -9,7 +9,7 @@ import java.util.*;
 public class TimeMeter {
     public static void main(String[] args) {
         Random random = new Random();
-        Object o = (Integer) 2_000_000;// "Ку-ку!";
+        Object o = (Integer) 2_000_000; //"Ку-ку!";
         long timeStart;
         LinkedList<Object> ekz1 = new LinkedList<>();
         ArrayList<Object> ekz2 = new ArrayList<>();
@@ -35,11 +35,10 @@ public class TimeMeter {
             timeStart = (System.currentTimeMillis());
             boolean isFound = toFind(ekz, o);
             long findingT = timing(timeStart);
-            //System.out.printf("Элемент найден (" + isFound + ") за %d мс\n", findingT);
+
             timeStart = System.currentTimeMillis();
             boolean isRemoved = toRemove(ekz, o);
             long removingT = timing(timeStart);
-            //System.out.printf("Элемент удалён (" + isRemoved + ") за %d мс\n", removingT);
 
             System.out.printf("поиск %dмс\tудаление %dмс\n",
                     findingT, removingT);
@@ -72,6 +71,7 @@ public class TimeMeter {
 
     //HashSet, TreeSet через Collection заполнилось неправильно.
     //В Collection нет get()
+    //TreeSet строковый объект среди интеджеров не взял на заполнение
     public static boolean toFind(Collection<Object> ekz, Object o) {
         return ekz.contains(o);
     }
