@@ -9,7 +9,6 @@ import java.util.*;
 public class TimeMeter {
     public static void main(String[] args) {
         Random random = new Random();
-        long timeStart;
         LinkedList<Object> ekz1 = new LinkedList<>();
         ArrayList<Object> ekz2 = new ArrayList<>();
         HashSet<Object> ekz3 = new HashSet<>();
@@ -23,39 +22,27 @@ public class TimeMeter {
 
         for (int i = 0; i < 4; i++) {
             Collection<Object> ekz = ekzes.get(i);
-            timeStart = System.nanoTime();
+            System.out.printf(ekz.getClass().getSimpleName());
+            System.out.println("\nВремя выполнения операции:");
             toFill(ekz);
-            System.out.printf("Время заполнения %s, %d мс\n", ekz.getClass().getSimpleName(), timing(timeStart) / 1000000);
-
-            System.out.println("Время на операцию с элементом:");
-            timeStart = System.nanoTime();
             toFind(random, ekz);
-            long findingT = timing(timeStart) / 1000000;
-
-            timeStart = System.nanoTime();
             toRemove(random, ekz);
-            long removingT = timing(timeStart) / 1000000;
-
-            System.out.printf("поиск %dмс\tудаление %dмс\n\n", findingT, removingT);
         }
     }
 
-    public static long timing(long timeStart) {
-        long timeStop = System.nanoTime();
-        return timeStop - timeStart;
-    }
     //При исп-нии Collection при заполнении через рандом ищет и удаляет непонятно что,
     // начинается с 100к элементов и диапазона рандома. После добавления в тот же метод size() работает.
 
     //При исп-нии Collection при заполнении через присвоение элементу значения счетчика i
     // работает нормально.
 
-    // 11java не принимает nextInt() с диапазоном.
-
     public static void toFill(Collection<Object> ekz) {
+        long time = System.currentTimeMillis();
         for (int i = 1; i < 500_001; i++) {
             ekz.add(i);
         }
+        long timeDiff = System.currentTimeMillis() - time;
+        System.out.printf("заполнение коллекции за %d мс", timeDiff);
     }
 
     //Непрерывным циклом интов LinkedList заполняется быстрее всех,
@@ -64,26 +51,22 @@ public class TimeMeter {
     //Удаляет и ищет быстрее: HashSet, TreeSet (мкс), ArrayList, LinkedList(мс)
     // (на больших объемах линкд гораздо быстрее в удалении).
     public static void toFind(Random random, Collection<Object> ekz) {
-        long sumSearch = 0;
         int j;
+        long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            long time = System.nanoTime();
             ekz.contains(random.nextInt(500_000));
-            long timeDiff = System.nanoTime() - time;
-            sumSearch = (sumSearch + timeDiff);
         }
-        System.out.println("Внутри метода Тпоиска, мкс = " + sumSearch / j);
+        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
+        System.out.printf("\nпоиск элемента, мс = %.3f", timeDiff);
     }
 
     public static void toRemove(Random random, Collection<Object> ekz) {
-        long sumDel = 0;
         int j;
+        long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            long time = System.nanoTime();
             ekz.remove(random.nextInt(500_000));
-            long timeDiff = System.nanoTime() - time;
-            sumDel = (sumDel + timeDiff);
         }
-        System.out.println("Внутри метода Тудаления, мкс = " + sumDel / j);
+        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
+        System.out.printf("\nудаление элемента, мс = %.3f\n\n", timeDiff);
     }
 }
