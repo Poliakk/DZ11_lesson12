@@ -19,15 +19,19 @@ public class TimeMeter {
         ekzes.add(ekz2);
         ekzes.add(ekz3);
         ekzes.add(ekz4);
+
+        long tAddC = 0, tFindC = 0, tRemoveC = 0;
+        long tAddL, tAddS, tFindL, tFindS, tRemoveL, tRemoveS;
         //вместе
         System.out.println("Работа при типе Collection");
         for (int i = 0; i < 4; i++) {
             Collection<Object> ekz = ekzes.get(i);
             System.out.printf(ekz.getClass().getSimpleName());
             System.out.println("\nВремя выполнения операции:");
-            toFill(ekz);
-            toFind(random, ekz);
-            toRemove(random, ekz);
+            tAddC = toFill(ekz);
+            tFindC = toFind(random, ekz);
+            tRemoveC = toRemove(random, ekz);
+            System.out.println("\n");
         }
 
         //по отдельности
@@ -37,15 +41,28 @@ public class TimeMeter {
             System.out.println("\nВремя выполнения операции:");
             if (i < 2) {
                 List<Object> ekz = (List<Object>) ekzes.get(i);
-                toFillList(ekz);
-                toFindLElemList(random, ekz);
+                ekz.clear();
+                tAddL = toFillList(ekz);
+                tFindL = toFindLElemList(random, ekz);
                 toGetElemList(random, ekz);
-                toRemoveElemList(random, ekz);
+                tRemoveL = toRemoveElemList(random, ekz);
+                System.out.println("\nРазница времени выполнения операции при обращении через Collection и List");
+                System.out.println("заполнение " + (tAddC - tAddL));
+                System.out.println("поиск " + (tFindC - tFindL));
+                System.out.println("удаление " + (tRemoveC - tRemoveL));
+                System.out.println();
             } else {
                 Set<Object> ekz = (Set<Object>) ekzes.get(i);
-                toFillSet(ekz);
-                toFindLElemSet(random, ekz);
-                toRemoveElemSet(random, ekz);
+                ekz.clear();
+                tAddS = toFillSet(ekz);
+                tFindS = toFindLElemSet(random, ekz);
+                tRemoveS = toRemoveElemSet(random, ekz);
+                //сравнение обращения через Collection и List, Set
+                System.out.println("\nРазница времени выполнения операции при обращении через Collection и Set");
+                System.out.println("заполнение tAddC = " + tAddC + ", tAddS = " + tAddS + (tAddC - tAddS));
+                System.out.println("поиск " + (tFindC - tFindS));
+                System.out.println("удаление " + (tRemoveC - tRemoveS));
+                System.out.println();
             }
         }
     }
@@ -55,96 +72,121 @@ public class TimeMeter {
     //При исп-нии Collection при заполнении через присвоение элементу значения счетчика i
     // работает нормально.
 
-    public static void toFill(Collection<Object> ekz) {
+    public static long toFill(Collection<Object> ekz) {
         long time = System.currentTimeMillis();
         for (int i = 1; i < 500_001; i++) {
             ekz.add(i);
         }
         long timeDiff = System.currentTimeMillis() - time;
         System.out.printf("заполнение коллекции за %d мс", timeDiff);
+        return timeDiff;
     }
 
-    public static void toFillList(List<Object> ekz) {
+    public static long toFillList(List<Object> ekz){
         long time = System.currentTimeMillis();
         for (int i = 1; i < 500_001; i++) {
             ekz.add(i);
         }
         long timeDiff = System.currentTimeMillis() - time;
-        System.out.printf("заполнение коллекции за %d мс", timeDiff);
+        System.out.printf("заполнение коллекции за %d мс\n", timeDiff);
+        return timeDiff;
     }
-    public static void toFillSet(Set<Object> ekz) {
+
+    public static long toFillSet(Set<Object> ekz) {
         long time = System.currentTimeMillis();
         for (int i = 1; i < 500_001; i++) {
             ekz.add(i);
         }
         long timeDiff = System.currentTimeMillis() - time;
-        System.out.printf("заполнение коллекции за %d мс", timeDiff);
+        System.out.printf("заполнение коллекции за %d мс\n", timeDiff);
+        return timeDiff;
     }
+
     //Непрерывным циклом интов LinkedList заполняется быстрее всех,
     //затем HashSet, ArrayList, TreeSet.
     //С ручной вставкой HashSet, ArrayList, LinkedList, TreeSet.
     //Удаляет и ищет быстрее: HashSet, TreeSet (мкс), ArrayList, LinkedList(мс)
     // (на больших объемах линкд гораздо быстрее в удалении).
-    public static void toFind(Random random, Collection<Object> ekz) {
+    public static long toFind(Random random, Collection<Object> ekz) {
         int j;
         long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            ekz.contains(random.nextInt(500_000));
+            ekz.contains(random.nextInt(400_000));
         }
-        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
-        System.out.printf("\nпоиск элемента, мс = %.3f", timeDiff);
+        float timeDiff = (float) ((System.nanoTime() - time)) / j / 1000;
+        System.out.printf("\nпоиск элемента, мс = %.2f", timeDiff);
+        return (long) timeDiff;
     }
-    public static void toFindLElemList(Random random, List<Object> ekz) {
+
+    public static long toFindLElemList(Random random, List<Object> ekz) {
         int j;
         long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            ekz.contains(random.nextInt(500_000));
+            ekz.contains(random.nextInt(400_000));
         }
-        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
-        System.out.printf("\nналичие элемента, мс = %.3f", timeDiff);
-    }public static void toFindLElemSet(Random random, Set<Object> ekz) {
-        int j;
-        long time = System.nanoTime();
-        for (j = 1; j < 1001; j++) {
-            ekz.contains(random.nextInt(500_000));
-        }
-        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
-        System.out.printf("\nналичие элемента, мс = %.3f", timeDiff);
+        float timeDiff = (float) ((System.nanoTime() - time)) / j / 1000;
+        System.out.printf("наличие  элемента, мс = %.2f", timeDiff);
+        return (long) timeDiff;
     }
+
+    public static long toFindLElemSet(Random random, Set<Object> ekz) {
+        int j;
+        long time = System.nanoTime();
+        for (j = 1; j < 1001; j++) {
+            ekz.contains(random.nextInt(400_000));
+        }
+        float timeDiff = (float) ((System.nanoTime() - time)) / j / 1000;
+        System.out.printf("наличие  элемента, мс = %.2f", timeDiff);
+        return (long) timeDiff;
+    }
+
     public static void toGetElemList(Random random, List<Object> ekz) {
         int j;
         long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            ekz.get(random.nextInt(500_000));
+            ekz.get(random.nextInt(400_000));
         }
-        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
-        System.out.printf("\nполучение элемента, мс = %.3f", timeDiff);
+        long timeDiff = (System.nanoTime() - time) / j;
+        System.out.printf("\nполучение элемента, мс = %d", timeDiff);
     }
-    public static void toRemove(Random random, Collection<Object> ekz) {
+
+    public static long toRemove(Random random, Collection<Object> ekz) {
         int j;
         long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            ekz.remove(random.nextInt(500_000));
+            ekz.size();
+            ekz.remove(random.nextInt(400_000));
         }
-        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
-        System.out.printf("\nудаление элемента, мс = %.3f\n\n", timeDiff);
+        float timeDiff = (float) ((System.nanoTime() - time)) / j / 1000;
+        System.out.printf("\nудаление элемента, мс = %.2f", timeDiff);
+        return (long) timeDiff;
     }
-    public static void toRemoveElemList(Random random, List<Object> ekz) {
+
+    public static long toRemoveElemList(Random random, List<Object> ekz) {
+        ekz.size();
         int j;
         long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            ekz.remove(random.nextInt(500_000));
+            ekz.size();
+            ekz.remove(random.nextInt(400_000));
+            ekz.size();
         }
-        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
-        System.out.printf("\nудаление элемента, мс = %.3f\n\n", timeDiff);
+        float timeDiff = (float) ((System.nanoTime() - time)) / j / 1000;
+        System.out.printf("\nудаление элемента, мс = %.2f", timeDiff);
+        return (long) timeDiff;
     }
-    public static void toRemoveElemSet(Random random, Set<Object> ekz) {
+
+    public static long toRemoveElemSet(Random random, Set<Object> ekz) {
+        ekz.size();
         int j;
         long time = System.nanoTime();
         for (j = 1; j < 1001; j++) {
-            ekz.remove(random.nextInt(500_000));
+            ekz.size();
+            ekz.remove(random.nextInt(400_000));
+            ekz.size();
         }
-        float timeDiff = (float) ((System.nanoTime() - time) / j / 1000.0);
-        System.out.printf("\nудаление элемента, мс = %.3f\n\n", timeDiff);
+        float timeDiff = (float) ((System.nanoTime() - time)) / j / 1000;
+        System.out.printf("\nудаление элемента, мс = %.2f", timeDiff);
+        return (long) timeDiff;
     }
 }
