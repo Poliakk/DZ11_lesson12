@@ -20,8 +20,8 @@ public class TimeMeter {
         ekzes.add(ekz3);
         ekzes.add(ekz4);
 
-        long tAddC = 0, tAddL, tAddS;
-        float tFindC = 0, tRemoveC = 0, tFindL, tFindS, tRemoveL, tRemoveS;
+        long tAddC, tAddL, tAddS;
+        float tFindC, tRemoveC, tFindL, tFindS, tRemoveL, tRemoveS;
 
         System.out.println("Работа при типе Collection");
         for (int i = 0; i < 4; i++) {
